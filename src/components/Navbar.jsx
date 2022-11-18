@@ -11,8 +11,12 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
+
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import { UserAuth } from "../contexts/AuthContext";
+
+import { Navigate, useNavigate } from "react-router-dom";
+
 const pages = [
   <a
     href="https://github.com/mustafa-bilen"
@@ -36,9 +40,10 @@ const pages = [
     Youtube
   </a>,
 ];
-const settings = ["Profile", "New", "Logout"];
+// const settings = ["New", "Logout"];
 
 function ResponsiveAppBar() {
+  const { user, logout } = UserAuth();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -56,7 +61,16 @@ function ResponsiveAppBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+      console.log("you are logged out");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
     <AppBar position="static" sx={{ backgroundColor: "black" }}>
       <Container maxWidth="xl">
@@ -109,8 +123,8 @@ function ResponsiveAppBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+              {pages.map((page, key1) => (
+                <MenuItem key={key1} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -136,9 +150,9 @@ function ResponsiveAppBar() {
             BLOG APP
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {pages.map((page, key2) => (
               <Button
-                key={page}
+                key={key2}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
@@ -154,6 +168,9 @@ function ResponsiveAppBar() {
                   alt="Remy Sharp"
                   src="https://www.looper.com/img/gallery/the-movie-like-american-psycho-that-horror-fans-need-to-see/intro-1620410303.jpg"
                 />
+                <Typography sx={{ color: "white", ml: "1rem" }}>
+                  {user && user.displayName}
+                </Typography>
               </IconButton>
             </Tooltip>
             <Menu
@@ -172,11 +189,12 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
+              <div className="w-[5rem] p-1 text-left flex flex-col gap-1">
+                <Typography className="cursor-pointer">New Post</Typography>
+                <Typography className="cursor-pointer" onClick={handleLogout}>
+                  Logout
+                </Typography>
+              </div>
             </Menu>
           </Box>
         </Toolbar>

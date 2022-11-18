@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
+
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -13,19 +14,36 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+import { UserAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
-
 export default function SignInSide() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+  const { login, googleLogin } = UserAuth();
+  const navigate = useNavigate();
+  const { email, setEmail, password, setPassword, error, setError } =
+    useContext(AuthContext);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password);
+      navigate("/");
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
+  const googleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await googleLogin();
+      navigate("/");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -77,6 +95,7 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -87,6 +106,7 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) => setPassword(e.target.value)}
               />
 
               <Button
@@ -102,6 +122,7 @@ export default function SignInSide() {
                 fullWidth
                 variant="contained"
                 sx={{ mb: 2 }}
+                onClick={googleSubmit}
               >
                 Sign In With Google <GoogleIcon sx={{ ml: 1 }} />
               </Button>
@@ -112,7 +133,12 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link
+                    onClick={() => navigate("/register")}
+                    to="/register"
+                    href="#"
+                    variant="body2"
+                  >
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
