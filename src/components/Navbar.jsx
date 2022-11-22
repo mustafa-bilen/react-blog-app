@@ -16,6 +16,7 @@ import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { UserAuth } from "../contexts/AuthContext";
 
 import { Navigate, useNavigate } from "react-router-dom";
+import zIndex from "@mui/material/styles/zIndex";
 
 const pages = [
   <a
@@ -72,7 +73,11 @@ function ResponsiveAppBar() {
     }
   };
   return (
-    <AppBar position="static" sx={{ backgroundColor: "black" }}>
+    <AppBar
+      position="sticky"
+      sx={{ backgroundColor: "black" }}
+      className="w-full"
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <BookmarksIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -189,8 +194,13 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <div className="w-[5rem] p-1 text-left flex flex-col gap-1">
-                <Typography className="cursor-pointer">New Post</Typography>
+              <div className="w-[4rem] p-1 text-left flex flex-col gap-1">
+                <Typography
+                  className="cursor-pointer"
+                  onClick={() => navigate("/new")}
+                >
+                  New
+                </Typography>
                 <Typography className="cursor-pointer" onClick={handleLogout}>
                   Logout
                 </Typography>

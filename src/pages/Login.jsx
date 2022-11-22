@@ -18,6 +18,7 @@ import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 const theme = createTheme();
 export default function SignInSide() {
@@ -25,11 +26,13 @@ export default function SignInSide() {
   const navigate = useNavigate();
   const { email, setEmail, password, setPassword, error, setError } =
     useContext(AuthContext);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await login(email, password);
       navigate("/");
+      toast("Wow so easy!");
     } catch (error) {
       console.log(error.message);
     }
