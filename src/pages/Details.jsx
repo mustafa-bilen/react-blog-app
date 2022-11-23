@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Layout from "../components/Layout";
 
 import Card from "@mui/material/Card";
@@ -10,10 +10,11 @@ import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
+import { useLocation } from "react-router-dom";
 const Details = () => {
+  const { state: details } = useLocation();
   return (
     <Layout>
       <p className="text-4xl text-center mt-5">✰ Details ✰</p>
@@ -23,20 +24,23 @@ const Details = () => {
             <Avatar sx={{ bgcolor: "black" }} aria-label="recipe"></Avatar>
           }
           action={<IconButton aria-label="settings"></IconButton>}
-          title="mustafabilen6669@gmail.com"
-          subheader="September 14, 2016"
+          title={details.username}
+          subheader={details.logdate}
         />
         <CardMedia
           component="img"
           height="194"
-          image="https://i.pinimg.com/736x/a4/6f/fb/a46ffbcc9f91c694b011995795c4ae04.jpg"
+          image={details.image}
           alt="Paella dish"
         />
+        <Typography
+          sx={{ textAlign: "center", mt: "1.5rem", fontSize: "2rem" }}
+        >
+          {details.title}
+        </Typography>
         <CardContent>
           <Typography variant="body2" color="text.secondary">
-            This impressive paella is a perfect party dish and a fun meal to
-            cook together with your guests. Add 1 cup of frozen peas along with
-            the mussels, if you like.
+            {details.textArea}
           </Typography>
         </CardContent>
         <CardActions disableSpacing>

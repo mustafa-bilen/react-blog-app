@@ -14,31 +14,29 @@ import CommentIcon from "@mui/icons-material/Comment";
 import { red } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 
-export default function RecipeReviewCard() {
+export default function RecipeReviewCard({ data }) {
   const navigate = useNavigate();
   return (
     <Card
       sx={{ maxWidth: 345 }}
-      onClick={() => navigate("/posts/:id")}
+      onClick={() => navigate(`/posts/${data.userId}`, { state: data })}
       className="cursor-pointer"
     >
       <CardHeader
         avatar={<Avatar sx={{ bgcolor: "black" }} aria-label="recipe"></Avatar>}
         action={<IconButton aria-label="settings"></IconButton>}
-        title="mustafabilen6669@gmail.com"
-        subheader="September 14, 2016"
+        title={data.username}
+        subheader={data.logdate}
       />
       <CardMedia
         component="img"
         height="194"
-        image="https://i.pinimg.com/736x/a4/6f/fb/a46ffbcc9f91c694b011995795c4ae04.jpg"
+        image={data.image}
         alt="Paella dish"
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          This impressive paella is a perfect party dish and a fun meal to cook
-          together with your guests. Add 1 cup of frozen peas along with the
-          mussels, if you like.
+          {data.textArea}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
