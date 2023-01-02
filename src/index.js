@@ -1,14 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
-import { AuthProvider } from "./contexts/AuthContext";
-import { BlogProvider } from "./contexts/BlogContext";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <AuthProvider>
-    <BlogProvider>
-      <App />
-    </BlogProvider>
-  </AuthProvider>
-);
+root.render(<App />, document.getElementById("root"));

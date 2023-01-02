@@ -1,10 +1,16 @@
-import AppRouter from "./app-router/AppRouter";
+import AppRouter from "./approuter/AppRouter";
+import { AuthProvider } from "./contexts/AuthContext";
+import { BlogProvider } from "./contexts/BlogContext";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
-    <div>
-      <AppRouter />
-    </div>
+    <AuthProvider>
+      <BlogProvider>
+        <AppRouter />
+        <ToastContainer />
+      </BlogProvider>
+    </AuthProvider>
   );
 }
 

@@ -1,68 +1,76 @@
-import { onValue, push, ref, set } from "firebase/database";
-import { createContext, useEffect, useState } from "react";
-import { auth, db } from "../helpers/firebase";
+import React, { useContext, useState, useEffect } from "react";
+import { getDatabase,ref,push,set, onValue,query, remove, update } from "firebase/database"
 
-export const BlogContext = createContext();
+const BlogContext = React.createContext();
 
-export const BlogProvider = ({ children }) => {
-  const [textArea, setTextArea] = useState("");
-  const [image, setImage] = useState("");
-  const [title, setTitle] = useState("");
-  const [blogData, setBlogData] = useState(undefined);
-  const handleSubmit = () => {
-    const newPost = {
-      textArea,
-      image,
-      title,
-      username: auth.currentUser.email,
-      userId: auth.currentUser.uid,
-      logdate: new Date().getMonth() + new Date(),
-    };
-    saveToDatabase(newPost);
-  };
+export function useBlog() {
+  return useContext(BlogContext);
+}
 
-  const saveToDatabase = (item) => {
-    const blogRef = ref(db, "Blog");
-    const newBlogRef = push(blogRef);
-    set(newBlogRef, {
-      ...item,
-    });
-  };
+export function BlogProvider({ children }) {
+  const [currentBlogs, setCurrentBlogs] = useState();
+
+  function addBlog(blogValue) {
+    const db=getDatabase();
+    const userRef=ref(db,"blogs")
+    const newUserRef=push(userRef)
+    set(newUserRef,blogValue);
+  }
+
+  function getOneBlog(id) {
+    const result = currentBlogs?.filter((item) => item.id === id);
+    return result;
+  }
+
+  function deleteOneBlog(id) {
+    const db = getDatabase();
+    // const userRef = ref(db, 'blogs');
+    remove(ref(db,"blogs/"+id))
+  }
+
+  function updateBlog(id, data) {
+    const db = getDatabase();
+    // const newUserKey=push(child(ref(db),"blogs/")).key;
+    const updates={};
+    updates["blogs/"+id]=data;
+    return update(ref(db),updates)
+  }
 
   useEffect(() => {
-    const blogRef = ref(db, "Blog");
-    onValue(blogRef, (snapshot) => {
-      const data = snapshot.val();
-      const blogArr = [];
-      for (let id in data) {
-        blogArr.push({ id, ...data[id] });
+    const db = getDatabase();
+    const blogRef = ref(db, 'blogs');
+    onValue(query(blogRef), snapshot => {
+      // console.log(snapshot.val());
+      const blogs = snapshot.val();
+      const blogL = [];
+      for (let id in blogs) {
+        blogL.push({ id, ...blogs[id] });
       }
-      setBlogData(blogArr);
+      //   console.log(blogL);
+      setCurrentBlogs(blogL);
     });
   }, []);
 
-  // const writeUserData = () => {
-  //   const db = getDatabase();
-  //   set(ref(db, "users/" + userId), {
-  //     username: auth.currentUser.displayName,
-  //     email: auth.currentUser.email,
-  //     image_url: image,
-  //   });
-  // };
-  return (
-    <BlogContext.Provider
-      value={{
-        textArea,
-        setTextArea,
-        image,
-        setImage,
-        title,
-        setTitle,
-        handleSubmit,
-        blogData,
-      }}
-    >
-      {children}
-    </BlogContext.Provider>
-  );
-};
+  const value = {
+    addBlog,
+    currentBlogs,
+    getOneBlog,
+    deleteOneBlog,
+    updateBlog,
+  };
+
+  return <BlogContext.Provider value={value}>{children}</BlogContext.Provider>;
+}
+
+/*
+https://stackoverflow.com/questions/37717602/retrieve-data-from-firebase-database-in-javascript
+
+var uid = user.uid
+firebase.database().ref('users/' + uid).on('value', function(snapshot) {
+    var first_name = snapshot.val().first_name;
+});
+*/
+/*
+https://stackoverflow.com/questions/59283028/get-data-by-id-from-firebase
+
+*/

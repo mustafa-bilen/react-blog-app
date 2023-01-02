@@ -1,89 +1,66 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { auth, googleProvider } from "../helpers/firebase";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
   onAuthStateChanged,
-  GoogleAuthProvider,
+  signInWithEmailAndPassword,
   signInWithPopup,
-  updateProfile,
-  sendPasswordResetEmail,
+  signOut,
 } from "firebase/auth";
-import { auth } from "../helpers/firebase";
-import toast, { Toaster } from "react-hot-toast";
-export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState({});
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [displayName, setDisplayName] = useState("");
+const AuthContext = React.createContext();
 
-  const createUser = (email, password) => {
-    try {
-      createUserWithEmailAndPassword(auth, email, password).then(() =>
-        updateProfile(auth.currentUser, { displayName })
-      );
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  const logout = () => {
-    return signOut(auth);
-  };
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
-  const login = (email, password) => {
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState();
+  const [loading, setLoading] = useState(true);
+
+  function signup(email, password) {
+    return createUserWithEmailAndPassword(auth, email, password);
+  }
+
+  function login(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
-    toast.success("Successfully toasted!");
-  };
+  }
 
-  const googleLogin = () => {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
-  };
-  const forgotPassword = (email) => {
-    return sendPasswordResetEmail(auth, email);
-  };
+  function logout() {
+    signOut(auth);
+  }
+
+  function loginWithGoogle() {
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      console.log(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false);
     });
-    return () => {
-      unsub();
-    };
+
+    return unsubscribe;
   }, []);
-  // useEffect(() => {
-  //   const unsubGoogle = onAuthStateChanged(auth, (currentUser) => {
-  //     setUser(currentUser);
-  //     console.log(currentUser);
-  //   });
-  // }, []);
+
+  const value = {
+    currentUser,
+    signup,
+    login,
+    logout,
+    loginWithGoogle,
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        createUser,
-        email,
-        setEmail,
-        password,
-        setPassword,
-        error,
-        setError,
-        user,
-        logout,
-        login,
-        googleLogin,
-        setDisplayName,
-        forgotPassword,
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
-};
-
-export const UserAuth = () => {
-  return useContext(AuthContext);
-};
+}
