@@ -40,12 +40,13 @@ const styles = {
     },
   },
   image: {
-    backgroundImage: "url(https://picsum.photos/1600/900)",
+    backgroundImage: "url(https://picsum.photos/1920/1080)",
     backgroundRepeat: "no-repeat",
     backgroundColor: grey[50],
     backgroundSize: "cover",
     backgroundPosition: "center",
     width: "100%",
+    height: "100vh",
     paddingTop: "40px",
   },
   paper: {
